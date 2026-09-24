@@ -3,7 +3,7 @@ import pygame
 from pygame.sprite import Sprite
 from pygame.sprite import Group
 from boundaries import Boundaries
-from consts import PlayerAction, PlayerDirection, PlayerState, PlayerType, ScreenProperties
+from consts import PlayerAction, PlayerDirection, PlayerType, ScreenProperties
 
 
 class Player(Sprite, ABC):
@@ -70,11 +70,11 @@ class Player(Sprite, ABC):
         # FRect keeps fractional positions, so slow movement doesn't stall or stutter.
         self.rect = pygame.FRect(position, ScreenProperties.PLAYER_SIZE)
 
-        if not self.boundaries.allowsRect(self.rect):
+        if not self.boundaries.allowsRectangle(self.rect):
             raise ValueError(f"{self.name} can't start at {position}: it's outside the boundary or inside an obstacle")
 
-    def move(self, directions: list[PlayerDirection], dt: float) -> None:
-        """Walk in the given directions for dt seconds; the boundaries stop the player at walls."""
+    def move(self, directions: list[PlayerDirection], delta_time: float) -> None:
+        """Walk in the given directions for delta_time seconds; the boundaries stop the player at walls."""
         velocity = sum((self.DIRECTION_VECTORS[direction] for direction in directions), pygame.Vector2())
 
         if velocity.length_squared() == 0:
@@ -83,7 +83,7 @@ class Player(Sprite, ABC):
 
         self.action = PlayerAction.WALK
         self.direction = directions[-1]
-        velocity.scale_to_length(self.speed * dt)  # diagonals are no faster than straight lines
+        velocity.scale_to_length(self.speed * delta_time)  # diagonals are no faster than straight lines
 
         # Every position change goes through the boundaries, which keeps the player inside at all times.
         self.rect = self.boundaries.move(self.rect, velocity.x, velocity.y)
@@ -103,6 +103,8 @@ class Human(Player):
     def __init__(self, name: str, position: tuple, boundaries: Boundaries, *groups: Group):
         super().__init__(PlayerType.HUMAN, name, position, boundaries, self.SPEED, self.COLOR, *groups)
 
-    def update(self, dt: float) -> None:
+    def update(self, delta_time: float) -> None:
         keys = pygame.key.get_pressed()
-        self.move([direction for direction, key_codes in self.CONTROLS.items() if any(keys[key] for key in key_codes)], dt)
+        held_directions = [direction for direction, key_codes in self.CONTROLS.items()
+                           if any(keys[key] for key in key_codes)]
+        self.move(held_directions, delta_time)

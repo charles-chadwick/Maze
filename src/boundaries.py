@@ -1,7 +1,7 @@
 import os.path
 
 import pygame
-from xml.etree import ElementTree as ETree
+from xml.etree import ElementTree
 from collections.abc import Iterable
 from consts import Paths, ScreenProperties
 
@@ -20,13 +20,13 @@ class Walls:
         self.top: list[tuple[float, float, float]] = []  # stop movement up
         self.bottom: list[tuple[float, float, float]] = []  # stop movement down
 
-    def crosses(self, rect: pygame.FRect) -> bool:
-        """True if any wall passes through the inside of rect."""
+    def crosses(self, rectangle: pygame.FRect) -> bool:
+        """True if any wall passes through the inside of rectangle."""
         return any(
-            rect.left < x < rect.right and start < rect.bottom and end > rect.top
+            rectangle.left < x < rectangle.right and start < rectangle.bottom and end > rectangle.top
             for x, start, end in self.left + self.right
         ) or any(
-            rect.top < y < rect.bottom and start < rect.right and end > rect.left
+            rectangle.top < y < rectangle.bottom and start < rectangle.right and end > rectangle.left
             for y, start, end in self.top + self.bottom
         )
 
@@ -36,35 +36,39 @@ class Walls:
         self.top += other.top
         self.bottom += other.bottom
 
-    def move(self, rect: pygame.FRect, dx: float, dy: float) -> pygame.FRect:
-        """Return rect moved by (dx, dy), stopped flush against the first wall in its way.
+    def move(self, rectangle: pygame.FRect, delta_x: float, delta_y: float) -> pygame.FRect:
+        """Return rectangle moved by (delta_x, delta_y), stopped flush against the first wall in its way.
 
-        Each axis is swept separately (x, then y), so a rect can't skip through a wall however
+        Each axis is swept separately (x, then y), so a rectangle can't skip through a wall however
         far it moves in one step, and moving diagonally into a wall slides along it.
         """
-        rect = rect.copy()
+        rectangle = rectangle.copy()
 
-        # Only walls that overlap the rect's span on the other axis can block it. The comparisons
-        # are strict, so a rect exactly level with the end of a wall slides past it.
-        if dx > 0:
-            rect.right = min([rect.right + dx, *(x for x, start, end in self.right
-                                                 if x >= rect.right and start < rect.bottom and end > rect.top)])
-        elif dx < 0:
-            rect.left = max([rect.left + dx, *(x for x, start, end in self.left
-                                               if x <= rect.left and start < rect.bottom and end > rect.top)])
+        # Only walls that overlap the rectangle's span on the other axis can block it. The comparisons
+        # are strict, so a rectangle exactly level with the end of a wall slides past it.
+        if delta_x > 0:
+            blocking_walls = [x for x, start, end in self.right
+                              if x >= rectangle.right and start < rectangle.bottom and end > rectangle.top]
+            rectangle.right = min([rectangle.right + delta_x, *blocking_walls])
+        elif delta_x < 0:
+            blocking_walls = [x for x, start, end in self.left
+                              if x <= rectangle.left and start < rectangle.bottom and end > rectangle.top]
+            rectangle.left = max([rectangle.left + delta_x, *blocking_walls])
 
-        if dy > 0:
-            rect.bottom = min([rect.bottom + dy, *(y for y, start, end in self.bottom
-                                                   if y >= rect.bottom and start < rect.right and end > rect.left)])
-        elif dy < 0:
-            rect.top = max([rect.top + dy, *(y for y, start, end in self.top
-                                             if y <= rect.top and start < rect.right and end > rect.left)])
+        if delta_y > 0:
+            blocking_walls = [y for y, start, end in self.bottom
+                              if y >= rectangle.bottom and start < rectangle.right and end > rectangle.left]
+            rectangle.bottom = min([rectangle.bottom + delta_y, *blocking_walls])
+        elif delta_y < 0:
+            blocking_walls = [y for y, start, end in self.top
+                              if y <= rectangle.top and start < rectangle.right and end > rectangle.left]
+            rectangle.top = max([rectangle.top + delta_y, *blocking_walls])
 
-        return rect
+        return rectangle
 
 
 class PolygonBoundary:
-    """A polygon a rect must stay inside (keep_inside=True) or outside (an obstacle).
+    """A polygon a rectangle must stay inside (keep_inside=True) or outside (an obstacle).
 
     Every edge must be horizontal or vertical.
     """
@@ -95,21 +99,23 @@ class PolygonBoundary:
             elif start != end:
                 raise ValueError(f"Edge {tuple(start)} -> {tuple(end)} is not horizontal or vertical")
 
-    def allowsRect(self, rect: pygame.FRect) -> bool:
-        """True if rect is entirely on the allowed side (e.g. to check a spawn position)."""
-        return not self.walls.crosses(rect) and self.isInside(rect.center) == self.keep_inside
+    def allowsRectangle(self, rectangle: pygame.FRect) -> bool:
+        """True if rectangle is entirely on the allowed side (e.g. to check a spawn position)."""
+        return not self.walls.crosses(rectangle) and self.isInside(rectangle.center) == self.keep_inside
 
     def isInside(self, point: Coordinate) -> bool:
-        px, py = point
+        point_x, point_y = point
         inside = False
         for index, start in enumerate(self.vertices):
             end = self.vertices[(index + 1) % len(self.vertices)]
-            if (start.y > py) != (end.y > py) and px < start.x + (py - start.y) * (end.x - start.x) / (end.y - start.y):
-                inside = not inside
+            if (start.y > point_y) != (end.y > point_y):
+                crossing_x = start.x + (point_y - start.y) * (end.x - start.x) / (end.y - start.y)
+                if point_x < crossing_x:
+                    inside = not inside
         return inside
 
-    def move(self, rect: pygame.FRect, dx: float, dy: float) -> pygame.FRect:
-        return self.walls.move(rect, dx, dy)
+    def move(self, rectangle: pygame.FRect, delta_x: float, delta_y: float) -> pygame.FRect:
+        return self.walls.move(rectangle, delta_x, delta_y)
 
     def signedArea(self) -> float:
         return sum(
@@ -137,7 +143,7 @@ class BoundaryObject(PolygonBoundary):
                          keep_inside=object_type != self.OBSTACLE_TYPE)
 
     @classmethod
-    def fromXml(cls, xml_object: ETree.Element) -> "BoundaryObject":
+    def fromXml(cls, xml_object: ElementTree.Element) -> "BoundaryObject":
         xml_polygon = xml_object.find("polygon")
         points = [tuple(float(value) for value in point.split(",")) for point in xml_polygon.get("points").split()]
 
@@ -166,7 +172,7 @@ class Boundaries:
         self.boundaries: dict[str, list[BoundaryObject]] = {}
         self.walls = Walls()
 
-        xml_game = ETree.parse(xml_path).getroot()
+        xml_game = ElementTree.parse(xml_path).getroot()
         if xml_game.get("name") != game_name:
             raise ValueError(f"{xml_path} is for game '{xml_game.get('name')}', not '{game_name}'")
 
@@ -178,8 +184,8 @@ class Boundaries:
             for boundary in self.boundaries[object_group]:
                 self.walls.extend(boundary.walls)
 
-    def allowsRect(self, rect: pygame.FRect) -> bool:
-        return all(boundary.allowsRect(rect) for group in self.boundaries.values() for boundary in group)
+    def allowsRectangle(self, rectangle: pygame.FRect) -> bool:
+        return all(boundary.allowsRectangle(rectangle) for group in self.boundaries.values() for boundary in group)
 
     def draw(self, surface: pygame.Surface) -> None:
         """Draw the outline of every boundary and obstacle."""
@@ -188,6 +194,6 @@ class Boundaries:
                 color = ScreenProperties.BOUNDARY_COLOR if boundary.keep_inside else ScreenProperties.OBSTACLE_COLOR
                 pygame.draw.polygon(surface, color, boundary.vertices, 2)
 
-    def move(self, rect: pygame.FRect, dx: float, dy: float) -> pygame.FRect:
-        """Move rect by (dx, dy), keeping it inside every boundary and outside every obstacle."""
-        return self.walls.move(rect, dx, dy)
+    def move(self, rectangle: pygame.FRect, delta_x: float, delta_y: float) -> pygame.FRect:
+        """Move rectangle by (delta_x, delta_y), keeping it inside every boundary and outside every obstacle."""
+        return self.walls.move(rectangle, delta_x, delta_y)

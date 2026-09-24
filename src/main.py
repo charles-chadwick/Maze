@@ -17,13 +17,13 @@ human = Human("Dumbass", (56, 8), boundaries)  # in the entrance at the top left
 
 # The loop
 while True:
-    dt = clock.tick(ScreenProperties.FRAME_RATE[0]) / 1000 # Tick Away, in seconds since the last frame
+    delta_time = clock.tick(ScreenProperties.FRAME_RATE[0]) / 1000 # Tick Away, in seconds since the last frame
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
 
-    human.update(dt)
+    human.update(delta_time)
 
     screen.fill(ScreenProperties.BACKGROUND_COLOR) # Do up the background
     boundaries.draw(screen)

@@ -34,21 +34,21 @@ class WallsMoveTest(unittest.TestCase):
         self.assertEqual(moved.topleft, (15.5, 13.25))
 
     def test_stops_flush_against_room_walls(self):
-        rect = pygame.FRect(10, 10, 10, 10)
-        self.assertEqual(self.walls.move(rect, 500, 0).right, 100)
-        self.assertEqual(self.walls.move(rect, -500, 0).left, 0)
-        self.assertEqual(self.walls.move(rect, 0, 500).bottom, 100)
-        self.assertEqual(self.walls.move(rect, 0, -500).top, 0)
+        rectangle = pygame.FRect(10, 10, 10, 10)
+        self.assertEqual(self.walls.move(rectangle, 500, 0).right, 100)
+        self.assertEqual(self.walls.move(rectangle, -500, 0).left, 0)
+        self.assertEqual(self.walls.move(rectangle, 0, 500).bottom, 100)
+        self.assertEqual(self.walls.move(rectangle, 0, -500).top, 0)
 
     def test_cannot_skip_through_an_obstacle(self):
-        rect = pygame.FRect(10, 45, 10, 10)
-        self.assertEqual(self.walls.move(rect, 500, 0).right, 40)
-        rect = pygame.FRect(45, 10, 10, 10)
-        self.assertEqual(self.walls.move(rect, 0, 500).bottom, 40)
+        rectangle = pygame.FRect(10, 45, 10, 10)
+        self.assertEqual(self.walls.move(rectangle, 500, 0).right, 40)
+        rectangle = pygame.FRect(45, 10, 10, 10)
+        self.assertEqual(self.walls.move(rectangle, 0, 500).bottom, 40)
 
     def test_stops_against_far_side_of_obstacle(self):
-        rect = pygame.FRect(80, 45, 10, 10)
-        self.assertEqual(self.walls.move(rect, -500, 0).left, 60)
+        rectangle = pygame.FRect(80, 45, 10, 10)
+        self.assertEqual(self.walls.move(rectangle, -500, 0).left, 60)
 
     def test_slides_along_a_wall_when_moving_diagonally(self):
         moved = self.walls.move(pygame.FRect(90, 10, 10, 10), 5, 5)
@@ -72,9 +72,9 @@ class ConcaveBoundaryTest(unittest.TestCase):
         self.boundary = PolygonBoundary([(32, 0), (32, 1248), (1888, 1248), (1888, 32), (96, 32), (96, 0)])
 
     def test_point_deep_inside_is_not_moved(self):
-        rect = pygame.FRect(500, 500, 16, 16)
-        self.assertEqual(self.boundary.move(rect, 0, 0).topleft, (500, 500))
-        self.assertEqual(self.boundary.move(rect, 100, 0).topleft, (600, 500))
+        rectangle = pygame.FRect(500, 500, 16, 16)
+        self.assertEqual(self.boundary.move(rectangle, 0, 0).topleft, (500, 500))
+        self.assertEqual(self.boundary.move(rectangle, 100, 0).topleft, (600, 500))
 
     def test_entrance_notch_edges_only_block_inside_the_notch(self):
         in_notch = pygame.FRect(40, 5, 16, 16)
@@ -104,16 +104,16 @@ class AllowsRectTest(unittest.TestCase):
         self.obstacle = PolygonBoundary(OBSTACLE, keep_inside=False)
 
     def test_room(self):
-        self.assertTrue(self.room.allowsRect(pygame.FRect(10, 10, 10, 10)))
-        self.assertTrue(self.room.allowsRect(pygame.FRect(0, 0, 10, 10)))
-        self.assertFalse(self.room.allowsRect(pygame.FRect(95, 10, 10, 10)))
-        self.assertFalse(self.room.allowsRect(pygame.FRect(200, 10, 10, 10)))
+        self.assertTrue(self.room.allowsRectangle(pygame.FRect(10, 10, 10, 10)))
+        self.assertTrue(self.room.allowsRectangle(pygame.FRect(0, 0, 10, 10)))
+        self.assertFalse(self.room.allowsRectangle(pygame.FRect(95, 10, 10, 10)))
+        self.assertFalse(self.room.allowsRectangle(pygame.FRect(200, 10, 10, 10)))
 
     def test_obstacle(self):
-        self.assertTrue(self.obstacle.allowsRect(pygame.FRect(10, 10, 10, 10)))
-        self.assertTrue(self.obstacle.allowsRect(pygame.FRect(30, 40, 10, 10)))
-        self.assertFalse(self.obstacle.allowsRect(pygame.FRect(35, 45, 10, 10)))
-        self.assertFalse(self.obstacle.allowsRect(pygame.FRect(45, 45, 10, 10)))
+        self.assertTrue(self.obstacle.allowsRectangle(pygame.FRect(10, 10, 10, 10)))
+        self.assertTrue(self.obstacle.allowsRectangle(pygame.FRect(30, 40, 10, 10)))
+        self.assertFalse(self.obstacle.allowsRectangle(pygame.FRect(35, 45, 10, 10)))
+        self.assertFalse(self.obstacle.allowsRectangle(pygame.FRect(45, 45, 10, 10)))
 
 
 class GameXmlTest(unittest.TestCase):
@@ -128,20 +128,20 @@ class GameXmlTest(unittest.TestCase):
 
     def test_moves_through_level_1(self):
         # Start in the entrance notch and walk straight down the left-hand corridor to the bottom wall.
-        rect = pygame.FRect(40, 4, 16, 16)
-        self.assertTrue(self.boundaries.allowsRect(rect))
-        self.assertEqual(self.boundaries.move(rect, 0, 5000).bottom, 1248)
+        rectangle = pygame.FRect(40, 4, 16, 16)
+        self.assertTrue(self.boundaries.allowsRectangle(rectangle))
+        self.assertEqual(self.boundaries.move(rectangle, 0, 5000).bottom, 1248)
 
         # Between the first two columns of obstacles: down is stopped by the long bar at y=608,
         # left by the first obstacle's right side.
-        rect = pygame.FRect(300, 150, 16, 16)
-        self.assertTrue(self.boundaries.allowsRect(rect))
-        self.assertEqual(self.boundaries.move(rect, 0, 5000).bottom, 608)
-        self.assertEqual(self.boundaries.move(rect, -500, 0).left, 288)
+        rectangle = pygame.FRect(300, 150, 16, 16)
+        self.assertTrue(self.boundaries.allowsRectangle(rectangle))
+        self.assertEqual(self.boundaries.move(rectangle, 0, 5000).bottom, 608)
+        self.assertEqual(self.boundaries.move(rectangle, -500, 0).left, 288)
 
     def test_obstacle_blocks_movement(self):
-        rect = pygame.FRect(100, 50, 16, 16)
-        self.assertEqual(self.boundaries.move(rect, 0, 500).bottom, 96)
+        rectangle = pygame.FRect(100, 50, 16, 16)
+        self.assertEqual(self.boundaries.move(rectangle, 0, 500).bottom, 96)
 
 
 if __name__ == "__main__":
