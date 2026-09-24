@@ -1,9 +1,9 @@
-"""Extract object layers (e.g. "Main Boundary" and "Obstacles") from every level
+"""Extract object layers (e.g. "Boundaries" and "Obstacles") from every level
 (Tiled group) in a .tmx map and write them to one clean XML file, src/res/<Game>.xml:
 
     <game name="Maze" ...>
       <level id="2" name="Level 1">
-        <objectgroup id="3" name="Main Boundary" ...> <object .../> </objectgroup>
+        <objectgroup id="3" name="Boundaries" ...> <object .../> </objectgroup>
         <objectgroup id="4" name="Obstacles" ...> <object .../> ... </objectgroup>
       </level>
     </game>
@@ -17,7 +17,7 @@ Every object keeps all of its attributes and properties. Its shape is cleaned up
 
 Usage:
     python extract_boundaries.py
-    python extract_boundaries.py Maze.tmx --name Maze --layer "Main Boundary" --layer Obstacles
+    python extract_boundaries.py Maze.tmx --name Maze --layer Boundaries --layer Obstacles
     python extract_boundaries.py --snap 1   # snap to whole pixels instead of the tile grid
     python extract_boundaries.py --snap 0   # keep points exactly as drawn
 """
@@ -29,7 +29,7 @@ from pathlib import Path
 
 ASSETS_DIRECTORY = Path(__file__).resolve().parent
 RESOURCES_DIRECTORY = ASSETS_DIRECTORY.parent / "src" / "res"
-DEFAULT_LAYERS = ["Main Boundary", "Obstacles"]
+DEFAULT_LAYERS = ["Boundaries", "Obstacles"]
 
 
 def format_number(value):
