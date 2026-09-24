@@ -1,10 +1,12 @@
 import pygame
 import sys
+
+import consts
 from consts import ScreenProperties
 
 # Init the game
 pygame.init()
-pygame.display.set_caption("Nice Game")
+pygame.display.set_caption("Maze Game")
 
 screen = pygame.display.set_mode(ScreenProperties.SCREEN_SIZE)
 clock = pygame.time.Clock()
@@ -20,4 +22,4 @@ while True:
     screen.fill(ScreenProperties.BACKGROUND_COLOR) # Do up the background
 
     pygame.display.update() # Update
-    clock.tick(FRAME_RATE) / 1000 # Tick Away
+    clock.tick(ScreenProperties.FRAME_RATE[0]) / 1000 # Tick Away
