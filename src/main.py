@@ -12,18 +12,21 @@ pygame.display.set_caption("Maze Game")
 
 screen = pygame.display.set_mode(ScreenProperties.SCREEN_SIZE)
 clock = pygame.time.Clock()
-human = Human("Dumbass", (0, 0))
 boundaries = Boundaries("Maze")
+human = Human("Dumbass", (56, 8), boundaries)  # in the entrance at the top left
 
 # The loop
 while True:
+    dt = clock.tick(ScreenProperties.FRAME_RATE[0]) / 1000 # Tick Away, in seconds since the last frame
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
 
+    human.update(dt)
 
     screen.fill(ScreenProperties.BACKGROUND_COLOR) # Do up the background
+    boundaries.draw(screen)
+    screen.blit(human.image, human.rect)
 
     pygame.display.update() # Update
-    clock.tick(ScreenProperties.FRAME_RATE[0]) / 1000 # Tick Away

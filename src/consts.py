@@ -25,7 +25,9 @@ class PlayerType(StrEnum):
 
 class ScreenProperties(tuple, Enum):
     BACKGROUND_COLOR = (50, 50, 50)
+    BOUNDARY_COLOR = (200, 200, 200)
     CELL_SIZE = (32, 32)
     FRAME_RATE = (32, 0)
+    OBSTACLE_COLOR = (200, 80, 80)
     PLAYER_SIZE = (16, 16)
     SCREEN_SIZE = (1920, 1280)
