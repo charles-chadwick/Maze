@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.2" orientation="orthogonal" renderorder="right-down" width="60" height="40" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="25">
+<map version="1.8" tiledversion="1.8.2" orientation="orthogonal" renderorder="right-down" width="60" height="40" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="74">
  <layer id="1" name="Background" width="60" height="40" locked="1">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -45,70 +45,97 @@
 </data>
  </layer>
  <group id="2" name="Level 1">
-  <objectgroup id="3" name="Boundaries">
-   <object id="1" x="64" y="0" width="64" height="1216">
-    <polygon points="0,0 64,0 64,1216 0,1216"/>
+  <objectgroup id="3" name="Main Boundary" locked="1">
+   <object id="25" name="Main Boundary" type="Boundary" x="63.4667" y="0">
+    <polygon points="-31.4667,0 -31.4667,656.842 -31.4667,1248 1760.53,1248 1760.53,1280 1824.53,1280 1824.53,1248 1825.07,1248 1824.53,32 32.5333,32 32.5333,0"/>
    </object>
-   <object id="2" x="64" y="1152" width="1792" height="64">
-    <polygon points="0,0 1792,0 1792,64 0,64"/>
+  </objectgroup>
+  <objectgroup id="4" name="Obstacles">
+   <object id="26" name="Empty Space" type="Obstacle" x="96" y="96">
+    <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
-   <object id="3" x="1792" y="320" width="64" height="896">
-    <polygon points="0,0 64,0 64,896 0,896"/>
+   <object id="32" name="Empty Space" type="Obstacle" x="352" y="96">
+    <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
-   <object id="4" x="1792" y="320" width="128" height="64">
-    <polygon points="0,0 128,0 128,64 0,64"/>
+   <object id="33" name="Empty Space" type="Obstacle" x="608" y="96">
+    <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
-   <object id="5" x="96" y="480" width="544" height="64">
-    <polygon points="0,0 544,0 544,64 0,64"/>
+   <object id="34" name="Empty Space" type="Obstacle" x="864" y="96">
+    <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
-   <object id="7" x="96" y="608" width="544" height="64">
-    <polygon points="0,0 544,0 544,64 0,64"/>
+   <object id="35" name="Empty Space" type="Obstacle" x="1120" y="96">
+    <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
-   <object id="8" x="96" y="736" width="864" height="64">
-    <polygon points="0,0 864,0 864,64 0,64"/>
+   <object id="36" name="Empty Space" type="Obstacle" x="1376" y="96">
+    <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
-   <object id="10" x="96" y="352" width="544" height="64">
-    <polygon points="0,0 544,0 544,64 0,64"/>
+   <object id="37" name="Empty Space" type="Obstacle" x="1632" y="96">
+    <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
-   <object id="12" x="896" y="480" width="64" height="320">
-    <polygon points="0,0 64,0 64,320 0,320"/>
+   <object id="52" name="Empty Space" type="Obstacle" x="96" y="352">
+    <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
-   <object id="13" x="704" y="480" width="192" height="64">
-    <polygon points="0,0 192,0 192,64 0,64"/>
+   <object id="53" name="Empty Space" type="Obstacle" x="352" y="352">
+    <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
-   <object id="14" x="512" y="640" width="64" height="160">
-    <polygon points="0,0 64,0 64,160 0,160"/>
+   <object id="54" name="Empty Space" type="Obstacle" x="608" y="352">
+    <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
-   <object id="15" x="320" y="384" width="64" height="256">
-    <polygon points="0,0 64,0 64,256 0,256"/>
+   <object id="55" name="Empty Space" type="Obstacle" x="864" y="352">
+    <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
-   <object id="16" x="96" y="960" width="1184" height="64">
-    <polygon points="0,0 1184,0 1184,64 0,64"/>
+   <object id="56" name="Empty Space" type="Obstacle" x="1120" y="352">
+    <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
-   <object id="17" x="1216" y="576" width="64" height="448">
-    <polygon points="0,0 64,0 64,448 0,448"/>
+   <object id="57" name="Empty Space" type="Obstacle" x="1376" y="352">
+    <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
-   <object id="18" x="1216" y="576" width="512" height="64">
-    <polygon points="0,0 512,0 512,64 0,64"/>
+   <object id="58" name="Empty Space" type="Obstacle" x="1632" y="352">
+    <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
-   <object id="19" x="1664" y="576" width="64" height="416">
-    <polygon points="0,0 64,0 64,416 0,416"/>
+   <object id="59" name="Empty Space" type="Obstacle" x="96" y="736">
+    <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
-   <object id="20" x="1344" y="960" width="384" height="64">
-    <polygon points="0,0 384,0 384,64 0,64"/>
+   <object id="60" name="Empty Space" type="Obstacle" x="352" y="736">
+    <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
-   <object id="21" x="1344" y="704" width="64" height="320">
-    <polygon points="0,0 64,0 64,320 0,320"/>
+   <object id="61" name="Empty Space" type="Obstacle" x="608" y="736">
+    <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
-   <object id="22" x="1344" y="704" width="256" height="64">
-    <polygon points="0,0 256,0 256,64 0,64"/>
+   <object id="62" name="Empty Space" type="Obstacle" x="864" y="736">
+    <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
-   <object id="23" x="1536" y="704" width="64" height="160">
-    <polygon points="0,0 64,0 64,160 0,160"/>
+   <object id="63" name="Empty Space" type="Obstacle" x="1120" y="736">
+    <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
-   <object id="24" x="96" y="64">
-    <polygon points="0,0 480,0 480,224 416,224 416,64 0,64"/>
+   <object id="64" name="Empty Space" type="Obstacle" x="1376" y="736">
+    <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
+   <object id="65" name="Empty Space" type="Obstacle" x="1632" y="736">
+    <polygon points="0,0 192,0 192,192 0,192"/>
+   </object>
+   <object id="66" name="Empty Space" type="Obstacle" x="96" y="992">
+    <polygon points="0,0 192,0 192,192 0,192"/>
+   </object>
+   <object id="67" name="Empty Space" type="Obstacle" x="352" y="992">
+    <polygon points="0,0 192,0 192,192 0,192"/>
+   </object>
+   <object id="68" name="Empty Space" type="Obstacle" x="608" y="992">
+    <polygon points="0,0 192,0 192,192 0,192"/>
+   </object>
+   <object id="69" name="Empty Space" type="Obstacle" x="864" y="992">
+    <polygon points="0,0 192,0 192,192 0,192"/>
+   </object>
+   <object id="70" name="Empty Space" type="Obstacle" x="1120" y="992">
+    <polygon points="0,0 192,0 192,192 0,192"/>
+   </object>
+   <object id="71" name="Empty Space" type="Obstacle" x="1376" y="992">
+    <polygon points="0,0 192,0 192,192 0,192"/>
+   </object>
+   <object id="72" name="Empty Space" type="Obstacle" x="1632" y="992">
+    <polygon points="0,0 192,0 192,192 0,192"/>
+   </object>
+   <object id="73" name="Empty Space" type="Obstacle" x="96" y="608" width="1728" height="64"/>
   </objectgroup>
  </group>
 </map>
