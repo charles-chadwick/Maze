@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<objectgroup source="Maze.tmx" group="Level 1" id="3" name="Main Boundary" locked="1" tilewidth="32" tileheight="32" count="1">
-  <object id="25" name="Main Boundary" type="Boundary" x="32" y="0">
-    <polygon points="0,0 0,1248 1792,1248 1792,1280 1856,1280 1856,32 64,32 64,0"/>
-  </object>
-</objectgroup>

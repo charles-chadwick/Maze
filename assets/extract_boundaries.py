@@ -1,5 +1,12 @@
-"""Extract object layers (e.g. "Main Boundary" and "Obstacles") from a group in a
-Tiled .tmx map and write each one out as a clean, standalone XML file in src/res.
+"""Extract object layers (e.g. "Main Boundary" and "Obstacles") from every level
+(Tiled group) in a .tmx map and write them to one clean XML file, src/res/<Game>.xml:
+
+    <game name="Maze" ...>
+      <level id="2" name="Level 1">
+        <objectgroup id="3" name="Main Boundary" ...> <object .../> </objectgroup>
+        <objectgroup id="4" name="Obstacles" ...> <object .../> ... </objectgroup>
+      </level>
+    </game>
 
 Every object keeps all of its attributes and properties. Its shape is cleaned up:
   * rectangles get an explicit <polygon>, so every object is parsed the same way
@@ -10,7 +17,7 @@ Every object keeps all of its attributes and properties. Its shape is cleaned up
 
 Usage:
     python extract_boundaries.py
-    python extract_boundaries.py Maze.tmx --group "Level 2" --layer "Main Boundary" --layer Obstacles
+    python extract_boundaries.py Maze.tmx --name Maze --layer "Main Boundary" --layer Obstacles
     python extract_boundaries.py --snap 1   # snap to whole pixels instead of the tile grid
     python extract_boundaries.py --snap 0   # keep points exactly as drawn
 """
@@ -23,17 +30,6 @@ from pathlib import Path
 ASSETS_DIR = Path(__file__).resolve().parent
 RES_DIR = ASSETS_DIR.parent / "src" / "res"
 DEFAULT_LAYERS = ["Main Boundary", "Obstacles"]
-
-
-def find_layer(root, group_name, layer_name):
-    """Return the <objectgroup> named layer_name inside the <group> named group_name."""
-    for group in root.iter("group"):
-        if group.get("name") != group_name:
-            continue
-        for layer in group.findall("objectgroup"):
-            if layer.get("name") == layer_name:
-                return layer
-    raise SystemExit(f'No object layer "{layer_name}" found in group "{group_name}".')
 
 
 def num(value):
@@ -98,25 +94,42 @@ def clean_object(obj, snap):
     return cleaned
 
 
-def extract(root, tmx_path, group_name, layer_name, snap):
-    layer = find_layer(root, group_name, layer_name)
+def build_layer(layer, snap):
     objects = [clean_object(obj, snap) for obj in layer.findall("object")]
-
-    out = ET.Element("objectgroup", {
-        "source": Path(tmx_path).name,
-        "group": group_name,
-        **layer.attrib,
-        "tilewidth": root.get("tilewidth", ""),
-        "tileheight": root.get("tileheight", ""),
-        "count": str(len(objects)),
-    })
+    out = ET.Element("objectgroup", {**layer.attrib, "count": str(len(objects))})
     # Carry over the layer's own properties (if any), then the objects.
     layer_props = layer.find("properties")
     if layer_props is not None:
         out.append(copy.deepcopy(layer_props))
     out.extend(objects)
+    return out
 
-    tree = ET.ElementTree(out)
+
+def extract(tmx_path, game_name, layer_names, snap):
+    """Build one <game> tree with a <level> per Tiled group, holding the chosen object layers."""
+    root = ET.parse(tmx_path).getroot()
+    if snap is None:
+        snap = float(root.get("tilewidth", 0))
+
+    game = ET.Element("game", {
+        "name": game_name,
+        "source": Path(tmx_path).name,
+        "width": str(int(root.get("width")) * int(root.get("tilewidth"))),
+        "height": str(int(root.get("height")) * int(root.get("tileheight"))),
+        "tilewidth": root.get("tilewidth", ""),
+        "tileheight": root.get("tileheight", ""),
+    })
+    for group in root.iter("group"):
+        layers = [l for l in group.findall("objectgroup") if l.get("name") in layer_names]
+        if not layers:
+            continue
+        level = ET.SubElement(game, "level", group.attrib)
+        for layer in sorted(layers, key=lambda l: layer_names.index(l.get("name"))):
+            level.append(build_layer(layer, snap))
+
+    if not len(game):
+        raise SystemExit(f"No levels with layers {layer_names} found in {tmx_path}.")
+    tree = ET.ElementTree(game)
     ET.indent(tree, space="  ")
     return tree
 
@@ -124,23 +137,20 @@ def extract(root, tmx_path, group_name, layer_name, snap):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("tmx", nargs="?", default=ASSETS_DIR / "Maze.tmx", help="path to the .tmx map")
-    parser.add_argument("--group", default="Level 1", help='group name (default: "Level 1")')
+    parser.add_argument("--name", help="game name, used for the output file (default: the .tmx file name)")
     parser.add_argument("--layer", action="append", dest="layers",
                         help=f"object layer to extract; repeatable (default: {', '.join(DEFAULT_LAYERS)})")
     parser.add_argument("--snap", type=float,
                         help="grid size to snap points to; 0 disables (default: the map's tile width)")
     args = parser.parse_args()
 
-    root = ET.parse(args.tmx).getroot()
-    snap = args.snap if args.snap is not None else float(root.get("tilewidth", 0))
+    name = args.name or Path(args.tmx).stem
+    tree = extract(args.tmx, name, args.layers or DEFAULT_LAYERS, args.snap)
     RES_DIR.mkdir(parents=True, exist_ok=True)
-
-    for layer_name in args.layers or DEFAULT_LAYERS:
-        output = RES_DIR / f"{args.group.replace(' ', '')}_{layer_name.replace(' ', '')}.xml"
-        tree = extract(root, args.tmx, args.group, layer_name, snap)
-        body = ET.tostring(tree.getroot(), encoding="unicode").replace(" />", "/>")
-        output.write_text(f'<?xml version="1.0" encoding="UTF-8"?>\n{body}\n', encoding="UTF-8")
-        print(f"Wrote {tree.getroot().get('count')} objects to {output}")
+    output = RES_DIR / f"{name.replace(' ', '')}.xml"
+    body = ET.tostring(tree.getroot(), encoding="unicode").replace(" />", "/>")
+    output.write_text(f'<?xml version="1.0" encoding="UTF-8"?>\n{body}\n', encoding="UTF-8")
+    print(f"Wrote {len(tree.getroot())} level(s) to {output}")
 
 
 if __name__ == "__main__":

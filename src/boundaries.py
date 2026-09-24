@@ -1,9 +1,15 @@
-from collections.abc import Iterable
+import os.path
+import pprint
+
 import pygame
+from xml.etree import ElementTree as ETree
+from collections.abc import Iterable
+from consts import Paths
 
 Coordinate = pygame.Vector2 | tuple[float, float]
 
 class PolygonBoundary:
+
     def __init__(self, vertices: Iterable[Coordinate]) -> None:
         self.vertices: list[pygame.Vector2] = [pygame.Vector2(vertex) for vertex in vertices]
 
@@ -79,3 +85,37 @@ class PolygonBoundary:
         projection_fraction = max(0, min(1, projection_fraction))
 
         return segment_start + segment_vector * projection_fraction
+
+class Boundaries:
+
+    def __init__(self, game_name):
+
+        xml_path = os.path.join(Paths.RES_PATH, f"{game_name}.xml")
+
+        if not os.path.exists(xml_path):
+            raise FileNotFoundError(f"{xml_path} does not exist!")
+
+        self.boundaries = {}
+
+        xml_game = ETree.parse(xml_path).getroot()
+        if xml_game.get("name") != game_name:
+            raise ValueError(f"{xml_path} is for game '{xml_game.get('name')}', not '{game_name}'")
+
+        for xml_level in xml_game.findall("level[@name='Level 1']/objectgroup"):
+            object_group = xml_level.get("name")
+            self.boundaries[object_group] = []
+            for xml_object in xml_level.findall("object"):
+
+                xml_polygon = xml_object.find("polygon")
+                polygon_points = [tuple(x.split(',')) for x in str(xml_polygon.get("points")).split(" ")]
+
+                self.boundaries[object_group].append({
+                    "id": xml_object.get("id"),
+                    "name": xml_object.get("name"),
+                    "type": xml_object.get("type"),
+                    "x": xml_object.get("x"),
+                    "y": xml_object.get("y"),
+                    "points": polygon_points
+                })
+
+        pprint.pprint(self.boundaries)

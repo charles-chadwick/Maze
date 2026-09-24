@@ -37,7 +37,7 @@ class Player(Sprite, ABC):
     
     @position.setter
     def position(self, value: tuple):
-        self._position = value.strip()
+        self._position = value
 
     @property
     def type(self) -> PlayerType:

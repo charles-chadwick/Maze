@@ -3,6 +3,8 @@ import pygame
 import sys
 from consts import ScreenProperties
 from players import Human
+from boundaries import Boundaries
+
 
 # Init the game
 pygame.init()
@@ -11,6 +13,7 @@ pygame.display.set_caption("Maze Game")
 screen = pygame.display.set_mode(ScreenProperties.SCREEN_SIZE)
 clock = pygame.time.Clock()
 human = Human("Dumbass", (0, 0))
+boundaries = Boundaries("Maze")
 
 # The loop
 while True:

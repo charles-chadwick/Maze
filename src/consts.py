@@ -1,4 +1,8 @@
 from enum import Enum, StrEnum
+import os.path
+
+class Paths(StrEnum):
+    RES_PATH = os.path.join(os.path.dirname(__file__), "res")
 
 class PlayerAction(StrEnum):
     STAND = "stand"

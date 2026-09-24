@@ -45,12 +45,12 @@
 </data>
  </layer>
  <group id="2" name="Level 1">
-  <objectgroup id="3" name="Main Boundary" locked="1">
+  <objectgroup id="3" name="Boundaries">
    <object id="25" name="Main Boundary" type="Boundary" x="63.4667" y="0">
     <polygon points="-31.4667,0 -31.4667,656.842 -31.4667,1248 1760.53,1248 1760.53,1280 1824.53,1280 1824.53,1248 1825.07,1248 1824.53,32 32.5333,32 32.5333,0"/>
    </object>
   </objectgroup>
-  <objectgroup id="4" name="Obstacles">
+  <objectgroup id="4" name="Obstacles" locked="1">
    <object id="26" name="Empty Space" type="Obstacle" x="96" y="96">
     <polygon points="0,0 192,0 192,192 0,192"/>
    </object>
