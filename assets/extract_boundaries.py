@@ -1,6 +1,6 @@
 """Extract an object layer (e.g. "Boundaries") from a group in a Tiled .tmx map,
 merge every set of overlapping polygons into a single polygon, and write the
-result out as a clean, standalone XML file.
+result out as a clean, standalone XML file in src/res.
 
 Merged objects:
   * keep the attributes and properties of their source objects
@@ -24,6 +24,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ASSETS_DIR = Path(__file__).resolve().parent
+RES_DIR = ASSETS_DIR.parent / "src" / "res"
 GEOMETRY_ATTRS = {"x", "y", "width", "height"}
 
 
@@ -239,10 +240,12 @@ def main():
     parser.add_argument("--group", default="Level 1", help='group name (default: "Level 1")')
     parser.add_argument("--layer", default="Boundaries", help='object layer name (default: "Boundaries")')
     parser.add_argument("--merge-touching", action="store_true", help="also merge shapes that only share an edge")
-    parser.add_argument("-o", "--output", help="output .xml path (default: assets/<Group>_<Layer>.xml)")
+    parser.add_argument("-o", "--output", help="output file name, saved in src/res (default: <Group>_<Layer>.xml)")
     args = parser.parse_args()
 
-    output = args.output or ASSETS_DIR / f"{args.group.replace(' ', '')}_{args.layer}.xml"
+    name = Path(args.output).name if args.output else f"{args.group.replace(' ', '')}_{args.layer}.xml"
+    RES_DIR.mkdir(parents=True, exist_ok=True)
+    output = RES_DIR / name
     tree = extract(args.tmx, args.group, args.layer, args.merge_touching)
     body = ET.tostring(tree.getroot(), encoding="unicode").replace(" />", "/>")
     Path(output).write_text(f'<?xml version="1.0" encoding="UTF-8"?>\n{body}\n', encoding="UTF-8")
